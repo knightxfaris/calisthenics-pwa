@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calisthenics Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Calisthenics Tracker">
+  <link rel="apple-touch-icon" href="icon.png">
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f0f0f0; }
+    h2, h3 { text-align: center; }
+    .day { margin-bottom: 30px; padding: 15px; background: #fff; border-radius: 10px; }
+    .exercise { margin-bottom: 15px; }
+    img { max-width: 100%; border-radius: 10px; }
+    input { width: 100%; padding: 8px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+
+<h2>Beginner Calisthenics - 4 Days</h2>
+<div id="container"></div>
+
+<script>
+const schedule = {
+  "Day 1 - Full Body": [
+    { name: "Jumping Jacks", gif: "https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif" },
+    { name: "Incline Push-ups", gif: "https://media.giphy.com/media/l0MYu5JMpJAD6KDP2/giphy.gif" },
+    { name: "Wall Sit", gif: "https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif" }
+  ],
+  "Day 2 - Core": [
+    { name: "Plank", gif: "https://media.giphy.com/media/xT0xeJpnrWC4XWblEk/giphy.gif" },
+    { name: "Crunches", gif: "https://media.giphy.com/media/Wp2r9WZFXkXv6/giphy.gif" },
+    { name: "Leg Raises", gif: "https://media.giphy.com/media/l1J9ur6XUttjE5n42/giphy.gif" }
+  ],
+  "Day 3 - Lower Body": [
+    { name: "Squats", gif: "https://media.giphy.com/media/3o7TKUMU2mDyoVbPFC/giphy.gif" },
+    { name: "Lunges", gif: "https://media.giphy.com/media/3ohjUCVv6XkZbIjBz6/giphy.gif" },
+    { name: "Calf Raises", gif: "https://media.giphy.com/media/fS6EStYNZpguqKxw5c/giphy.gif" }
+  ],
+  "Day 4 - Upper Body": [
+    { name: "Wall Push-ups", gif: "https://media.giphy.com/media/12HZukMBlutpoQ/giphy.gif" },
+    { name: "Arm Circles", gif: "https://media.giphy.com/media/JUfiqR6cNtJao/giphy.gif" },
+    { name: "Superman Hold", gif: "https://media.giphy.com/media/3ov9jNziFTMfzSumAw/giphy.gif" }
+  ]
+};
+
+const container = document.getElementById("container");
+
+for (let day in schedule) {
+  let dayDiv = document.createElement("div");
+  dayDiv.className = "day";
+  let header = `<h3>${day}</h3>`;
+  let content = "";
+
+  schedule[day].forEach((ex, i) => {
+    let saved = localStorage.getItem(`${day}-${i}`) || "";
+    content += `
+      <div class="exercise">
+        <p><strong>${ex.name}</strong></p>
+        <img src="${ex.gif}" alt="${ex.name}">
+        <input type="text" placeholder="Reps & Sets" value="${saved}" onchange="saveData('${day}-${i}', this.value)">
+      </div>
+    `;
+  });
+
+  dayDiv.innerHTML = header + content;
+  container.appendChild(dayDiv);
+}
+
+function saveData(key, value) {
+  localStorage.setItem(key, value);
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+</body>
+</html>
