@@ -111,10 +111,8 @@ function saveDay() {
     savedDates.push(today);
     localStorage.setItem("savedDates", JSON.stringify(savedDates));
     populateDatePicker();
-    alert("✅ Today's data saved!");
-  } else {
-    alert("📝 Already saved today!");
   }
+  alert("✅ Data saved!");
 }
 
 function populateDatePicker() {
