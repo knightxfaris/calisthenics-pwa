@@ -59,7 +59,11 @@
     select { display: block; margin: 10px auto; padding: 10px; font-size: 16px; }
   </style>
 </head>
-<body>
+<body onload="applyTheme()">
+  <button onclick="toggleTheme()" style="position:fixed;top:15px;right:15px;z-index:1000;padding:10px 15px;font-size:14px;display:flex;align-items:center;gap:8px;background:#333;border:none;border-radius:8px;color:white;">
+  <span>🌓</span> <span style="font-size:13px;">Theme</span>
+</button>
+
 
 <h2>Beginner Calisthenics - 4 Days</h2>
 <div class="date" id="dateDisplay"></div>
@@ -228,6 +232,32 @@ if ('serviceWorker' in navigator) {
 
 generateUI(today);
 populateDatePicker();
+
+function toggleTheme() {
+  const current = localStorage.getItem("theme") || "dark";
+  const newTheme = current === "dark" ? "light" : "dark";
+  localStorage.setItem("theme", newTheme);
+  applyTheme();
+}
+
+function applyTheme() {
+  const theme = localStorage.getItem("theme") || "dark";
+  if (theme === "light") {
+    document.documentElement.style.setProperty("--bg-color", "#f0f0f0");
+    document.documentElement.style.setProperty("--card-color", "#ffffff");
+    document.documentElement.style.setProperty("--text-color", "#000000");
+    document.documentElement.style.setProperty("--input-bg", "#ffffff");
+    document.documentElement.style.setProperty("--button-bg", "#dddddd");
+    document.documentElement.style.setProperty("--button-hover", "#cccccc");
+  } else {
+    document.documentElement.style.setProperty("--bg-color", "#121212");
+    document.documentElement.style.setProperty("--card-color", "#1e1e1e");
+    document.documentElement.style.setProperty("--text-color", "#ffffff");
+    document.documentElement.style.setProperty("--input-bg", "#2c2c2c");
+    document.documentElement.style.setProperty("--button-bg", "#333333");
+    document.documentElement.style.setProperty("--button-hover", "#444444");
+  }
+}
 </script>
 
 </body>
