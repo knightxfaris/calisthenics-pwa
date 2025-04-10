@@ -16,34 +16,43 @@
     img { max-width: 100%; border-radius: 10px; }
     .input-group { display: flex; gap: 10px; margin-top: 5px; }
     input { flex: 1; padding: 8px; }
+    .date { text-align: center; margin-bottom: 20px; font-size: 16px; }
   </style>
 </head>
 <body>
 
 <h2>Beginner Calisthenics - 4 Days</h2>
+<div class="date" id="dateDisplay"></div>
 <div id="container"></div>
 
 <script>
+const today = new Date().toISOString().split('T')[0];
+document.getElementById("dateDisplay").textContent = `Today's Date: ${today}`;
+
 const schedule = {
   "Day 1 - Full Body": [
     { name: "Jumping Jacks", gif: "jumping-jacks.gif" },
     { name: "Incline Push-ups", gif: "incline-pushups.gif" },
-    { name: "Wall Sit", gif: "wall-sit.gif" }
+    { name: "Wall Sit", gif: "wall-sit.gif" },
+    { name: "Mountain Climbers", gif: "mountain-climbers.gif" }
   ],
   "Day 2 - Core": [
     { name: "Plank", gif: "plank.gif" },
     { name: "Crunches", gif: "crunches.gif" },
-    { name: "Leg Raises", gif: "leg-raises.gif" }
+    { name: "Leg Raises", gif: "leg-raises.gif" },
+    { name: "Flutter Kicks", gif: "flutter-kicks.gif" }
   ],
   "Day 3 - Lower Body": [
     { name: "Squats", gif: "squats.gif" },
     { name: "Lunges", gif: "lunges.gif" },
-    { name: "Calf Raises", gif: "calf-raises.gif" }
+    { name: "Calf Raises", gif: "calf-raises.gif" },
+    { name: "Glute Bridges", gif: "glute-bridges.gif" }
   ],
   "Day 4 - Upper Body": [
     { name: "Wall Push-ups", gif: "wall-pushups.gif" },
     { name: "Arm Circles", gif: "arm-circles.gif" },
-    { name: "Superman Hold", gif: "superman-hold.gif" }
+    { name: "Superman Hold", gif: "superman-hold.gif" },
+    { name: "Chair Dips", gif: "chair-dips.gif" }
   ]
 };
 
@@ -56,15 +65,17 @@ for (let day in schedule) {
   let content = "";
 
   schedule[day].forEach((ex, i) => {
-    let reps = localStorage.getItem(`${day}-${i}-reps`) || "";
-    let sets = localStorage.getItem(`${day}-${i}-sets`) || "";
+    const repKey = `${today}-${day}-${i}-reps`;
+    const setKey = `${today}-${day}-${i}-sets`;
+    let reps = localStorage.getItem(repKey) || "";
+    let sets = localStorage.getItem(setKey) || "";
     content += `
       <div class="exercise">
         <p><strong>${ex.name}</strong></p>
         <img src="${ex.gif}" alt="${ex.name}">
         <div class="input-group">
-          <input type="text" placeholder="Reps" value="${reps}" onchange="saveData('${day}-${i}-reps', this.value)">
-          <input type="text" placeholder="Sets" value="${sets}" onchange="saveData('${day}-${i}-sets', this.value)">
+          <input type="text" placeholder="Reps" value="${reps}" onchange="saveData('${repKey}', this.value)">
+          <input type="text" placeholder="Sets" value="${sets}" onchange="saveData('${setKey}', this.value)">
         </div>
       </div>
     `;
