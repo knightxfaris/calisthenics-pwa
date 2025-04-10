@@ -17,13 +17,18 @@
     .input-group { display: flex; gap: 10px; margin-top: 5px; }
     input { flex: 1; padding: 8px; }
     .date { text-align: center; margin-bottom: 20px; font-size: 16px; }
+    button { display: block; margin: 10px auto; padding: 10px 20px; font-size: 16px; }
+    #history { background: #fff; padding: 10px; border-radius: 10px; }
   </style>
 </head>
 <body>
 
 <h2>Beginner Calisthenics - 4 Days</h2>
 <div class="date" id="dateDisplay"></div>
+<button onclick="saveDay()">✅ Save Today</button>
+<button onclick="showHistory()">📅 Show Previous Days</button>
 <div id="container"></div>
+<div id="history"></div>
 
 <script>
 const today = new Date().toISOString().split('T')[0];
@@ -74,8 +79,8 @@ for (let day in schedule) {
         <p><strong>${ex.name}</strong></p>
         <img src="${ex.gif}" alt="${ex.name}">
         <div class="input-group">
-          <input type="text" placeholder="Reps" value="${reps}" onchange="saveData('${repKey}', this.value)">
-          <input type="text" placeholder="Sets" value="${sets}" onchange="saveData('${setKey}', this.value)">
+          <input type="number" placeholder="Reps" value="${reps}" onchange="saveData('${repKey}', this.value)" min="0">
+          <input type="number" placeholder="Sets" value="${sets}" onchange="saveData('${setKey}', this.value)" min="0">
         </div>
       </div>
     `;
@@ -86,7 +91,33 @@ for (let day in schedule) {
 }
 
 function saveData(key, value) {
-  localStorage.setItem(key, value);
+  if (value >= 0) {
+    localStorage.setItem(key, value);
+  }
+}
+
+function saveDay() {
+  let savedDates = JSON.parse(localStorage.getItem("savedDates") || "[]");
+  if (!savedDates.includes(today)) {
+    savedDates.push(today);
+    localStorage.setItem("savedDates", JSON.stringify(savedDates));
+    alert("✅ Today's data saved!");
+  } else {
+    alert("📝 Already saved today!");
+  }
+}
+
+function showHistory() {
+  let savedDates = JSON.parse(localStorage.getItem("savedDates") || "[]");
+  let historyDiv = document.getElementById("history");
+  historyDiv.innerHTML = "<h3>📅 Previous Days:</h3>";
+  if (savedDates.length === 0) {
+    historyDiv.innerHTML += "<p>No saved days yet.</p>";
+    return;
+  }
+  savedDates.forEach(date => {
+    historyDiv.innerHTML += `<p>✅ ${date}</p>`;
+  });
 }
 
 if ('serviceWorker' in navigator) {
