@@ -36,8 +36,24 @@
 <div id="history"></div>
 
 <script>
-const today = new Date().toISOString().split('T')[0];
-document.getElementById("dateDisplay").textContent = `Today's Date: ${today}`;
+const today = new Date();
+const minDate = new Date(2025, 0, 1); // Start date: 2025-01-01
+const maxDate = new Date(2030, 11, 31); // End date: 2030-12-31
+
+document.getElementById("dateDisplay").textContent = `Today's Date: ${today.toISOString().split('T')[0]}`;
+
+function generateDatePicker() {
+  const picker = document.getElementById("datePicker");
+  for (let d = new Date(minDate); d <= maxDate; d.setDate(d.getDate() + 1)) {
+    const dateString = d.toISOString().split('T')[0];
+    const option = document.createElement("option");
+    option.value = dateString;
+    option.textContent = dateString;
+    picker.appendChild(option);
+  }
+}
+
+generateDatePicker();
 
 const schedule = {
   "Day 1 - Full Body": [
@@ -122,6 +138,23 @@ function populateDatePicker() {
   dates.forEach(d => {
     picker.innerHTML += `<option value="${d}">${d}</option>`;
   });
+}
+
+function showSelectedDayResult() {
+  const selectedDate = document.getElementById("datePicker").value;
+  if (!selectedDate) {
+    alert("Please select a date first!");
+    return;
+  }
+  loadDateData(selectedDate);
+  const resultSection = document.getElementById("calendarData");
+  if (resultSection) {
+    resultSection.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function showHistory() {
