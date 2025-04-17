@@ -29,6 +29,13 @@
     img { max-width: 100%; border-radius: 10px; }
     .input-group { display: flex; gap: 10px; margin-top: 5px; }
     input {
+      background: #2b2b2b;
+      color: var(--text-color);
+      border: 1px solid #444;
+      border-radius: 5px;
+      appearance: none;
+      -webkit-appearance: none;
+    }
       flex: 1;
       padding: 8px;
       background: var(--input-bg);
@@ -150,8 +157,8 @@
               <p><strong>${ex.name}</strong></p>
               <img src="${ex.gif}" alt="${ex.name}">
               <div class="input-group">
-                <input type="number" placeholder="Reps" value="${reps}" onchange="saveData('${repKey}', this.value)" min="0">
-                <input type="number" placeholder="Sets" value="${sets}" onchange="saveData('${setKey}', this.value)" min="0">
+                <input type="number" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${reps}" onchange="saveData('${repKey}', this.value)" min="0">
+                <input type="number" inputmode="numeric" pattern="[0-9]*" placeholder="Sets" value="${sets}" onchange="saveData('${setKey}', this.value)" min="0">
               </div>
             </div>
           `;
