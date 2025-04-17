@@ -3,55 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calisthenics Tracker</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBGDV3F8YZ6-bqtkx4AMbEt-Sy8PYlPkUU",
-      authDomain: "calisthenics-tracker-45570.firebaseapp.com",
-      projectId: "calisthenics-tracker-45570",
-      storageBucket: "calisthenics-tracker-45570.firebasestorage.app",
-      messagingSenderId: "330168228790",
-      appId: "1:330168228790:web:c24cfe79e669e6237dbf17",
-      measurementId: "G-Y3KN5D0DCH"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    window.saveToCloud = async function(user, date, key, value) {
-      const docRef = doc(db, "users", user);
-      const docSnap = await getDoc(docRef);
-      let data = docSnap.exists() ? docSnap.data() : {};
-      if (!data[date]) data[date] = {};
-      data[date][key] = value;
-      await setDoc(docRef, data);
+  <title>Welcome</title>
+  <style>
+    body {
+      background: #0e0e0e;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-
-    window.loadFromCloud = async function(user, date, key) {
-      const docRef = doc(db, "users", user);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists() && docSnap.data()[date]) {
-        return docSnap.data()[date][key] || "";
-      }
-      return "";
+    input {
+      padding: 10px;
+      font-size: 16px;
+      background: #1d1d1d;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 5px;
+      margin-top: 10px;
     }
-  </script>
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #444;
+    }
+  </style>
 </head>
 <body>
-  <h2>Calisthenics Tracker - Welcome Faris</h2>
-  <div id="status"></div>
-  <script>
-    const user = "Faris";
-    const today = new Date().toISOString().split("T")[0];
-    const key = "squats";
-    const value = "3x15";
+  <h2>Welcome to Calisthenics Tracker</h2>
+  <p>Please enter your name to continue</p>
+  <input type="text" id="username" placeholder="Your name" />
+  <button onclick="startApp()">Start</button>
 
-    saveToCloud(user, today, key, value).then(() => {
-      document.getElementById("status").innerText = "Saved to Firebase ✅";
-    });
+  <script>
+    function startApp() {
+      const name = document.getElementById("username").value.trim();
+      if (!name) {
+        alert("Please enter a name.");
+        return;
+      }
+      localStorage.setItem("username", name);
+      window.location.href = "tracker.html";
+    }
   </script>
 </body>
 </html>
