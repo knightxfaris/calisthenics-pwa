@@ -166,6 +166,21 @@
   <input id="datePicker" onchange="generateUI(this.value, localStorage.getItem('username') || 'Faris')">
     <option value="">📅 Select a date</option>
   </select>
+  
+  <div style="margin-bottom: 20px; text-align: center;">
+    <label>Select Date:</label><br>
+    <input id="dateInput" type="date" style="margin: 10px;" />
+    <br><label>Select Workout Day:</label><br>
+    <select id="daySelect" style="margin: 10px;">
+      <option value="">-- Choose Day --</option>
+      <option value="Day 1 - Full Body">Day 1 - Full Body</option>
+      <option value="Day 2 - Core">Day 2 - Core</option>
+      <option value="Day 3 - Lower Body">Day 3 - Lower Body</option>
+      <option value="Day 4 - Upper Body">Day 4 - Upper Body</option>
+    </select>
+    <button onclick="renderWorkout()">Show Exercises</button>
+  </div>
   <div id="container"></div>
+
 </body>
 </html>
