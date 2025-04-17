@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGDV3F8YZ6-bqtkx4AMbEt-Sy8PYlPkUU",
+      authDomain: "calisthenics-tracker-45570.firebaseapp.com",
+      projectId: "calisthenics-tracker-45570",
+      storageBucket: "calisthenics-tracker-45570.firebasestorage.app",
+      messagingSenderId: "330168228790",
+      appId: "1:330168228790:web:c24cfe79e669e6237dbf17",
+      measurementId: "G-Y3KN5D0DCH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadUsers() {
+      const userList = document.getElementById("userList");
+      const querySnapshot = await getDocs(collection(db, "approved_users"));
+      userList.innerHTML = "";
+      querySnapshot.forEach(docSnap => {
+        const username = docSnap.id;
+        const approved = docSnap.data().approved;
+        const div = document.createElement("div");
+        div.innerHTML = `<div style="display:flex;align-items:center;gap:10px;">
+          <strong>${username}</strong> - ${approved ? "✅ Approved" : "⛔ Not Approved"}
+          ${!approved ? `<button onclick="approve('${username}')">Approve</button>` : ""} <button onclick="reject('${username}')">❌ Reject</button> <button onclick="remove('${username}')">🗑️ Delete</button>
+        </div>`;
+        userList.appendChild(div);
+      });
+    }
+
+    window.approve = async function(username) {
+      const ref = doc(db, "approved_users", username);
+      await updateDoc(ref, { approved: true });
+      loadUsers();
+    }
+
+    
+    window.reject = async function(username) {
+      const ref = doc(db, "approved_users", username);
+      await updateDoc(ref, { approved: false });
+      loadUsers();
+    }
+    window.remove = async function(username) {
+      const ref = doc(db, "approved_users", username);
+      await deleteDoc(ref);
+      loadUsers();
+    }
+    window.onload = loadUsers;
+    
+  </script>
+  <style>
+    body { background: #0e0e0e; color: white; font-family: Arial; padding: 20px; }
+    h2 { text-align: center; }
+    div { margin-bottom: 15px; }
+    button {
+      margin-left: 10px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h2>Admin Panel - Approve Users</h2>
+  <div id="userList">Loading...</div>
+</body>
+</html>
