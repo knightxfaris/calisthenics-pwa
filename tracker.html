@@ -42,7 +42,10 @@
     window.onload = async function() {
       const user = localStorage.getItem("username") || "Faris";
       const today = new Date().toISOString().split('T')[0];
-      document.getElementById("dateDisplay").textContent = `User: ${user} | ${today}`;
+      
+const dateDisplay = document.getElementById("dateDisplay");
+dateDisplay.textContent = `User: ${user} | Date: ${today}`;
+
       generateUI(today, user);
       populateDatePicker();
       flatpickr("#datePicker", {
@@ -182,7 +185,7 @@ function renderWorkout() {
 </head>
 <body>
   <h2>Calisthenics Tracker - Faris</h2>
-  <div id="dateDisplay"></div>
+  <div id="dateDisplay" style="text-align:center;margin-bottom:10px;"></div>
   <input id="datePicker" onchange="generateUI(this.value, localStorage.getItem('username') || 'Faris')">
     <option value="">📅 Select a date</option>
   </select>
