@@ -2,8 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Login</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGDV3F8YZ6-bqtkx4AMbEt-Sy8PYlPkUU",
+      authDomain: "calisthenics-tracker-45570.firebaseapp.com",
+      projectId: "calisthenics-tracker-45570",
+      storageBucket: "calisthenics-tracker-45570.firebasestorage.app",
+      messagingSenderId: "330168228790",
+      appId: "1:330168228790:web:c24cfe79e669e6237dbf17",
+      measurementId: "G-Y3KN5D0DCH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function startApp() {
+      const username = document.getElementById("username").value.trim();
+      if (!username) {
+        alert("Please enter a name.");
+        return;
+      }
+
+      const ref = doc(db, "approved_users", username);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        const approved = snap.data().approved;
+        if (approved) {
+          localStorage.setItem("username", username);
+          window.location.href = "tracker.html";
+        } else {
+          alert("⛔ Access denied. Awaiting admin approval.");
+        }
+      } else {
+        await setDoc(ref, { approved: false });
+        alert("📝 Request sent. Await admin approval.");
+      }
+    }
+
+    window.startApp = startApp;
+  </script>
   <style>
     body {
       background: #0e0e0e;
@@ -15,6 +58,7 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      text-align: center;
     }
     input {
       padding: 10px;
@@ -41,21 +85,9 @@
   </style>
 </head>
 <body>
-  <h2>Welcome to Calisthenics Tracker</h2>
-  <p>Please enter your name to continue</p>
+  <h2>Calisthenics Tracker</h2>
+  <p>Enter your name to request access</p>
   <input type="text" id="username" placeholder="Your name" />
   <button onclick="startApp()">Start</button>
-
-  <script>
-    function startApp() {
-      const name = document.getElementById("username").value.trim();
-      if (!name) {
-        alert("Please enter a name.");
-        return;
-      }
-      localStorage.setItem("username", name);
-      window.location.href = "tracker.html";
-    }
-  </script>
 </body>
 </html>
