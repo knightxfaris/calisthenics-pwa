@@ -75,7 +75,17 @@
     }
   </style>
 </head>
-<body>
+<body onload="checkAccess()">
+<script>
+function checkAccess() {
+  const user = localStorage.getItem("username");
+  if (user !== "Faris") {
+    alert("⛔ Access denied. Admin only.");
+    window.location.href = "index.html";
+  }
+}
+</script>
+
   <h2>Admin Panel - Approve Users</h2>
   <div id="userList">Loading...</div>
 </body>
