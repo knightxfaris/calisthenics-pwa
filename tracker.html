@@ -149,7 +149,15 @@
         document.addEventListener('gesturestart', function (e) {
           e.preventDefault();
         });
-        </script>
+        
+function renderWorkout() {
+  const date = document.getElementById("dateInput").value;
+  const day = document.getElementById("daySelect").value;
+  const user = localStorage.getItem("username") || "Faris";
+  if (!date || !day) return alert("Please select date and day.");
+  renderDay(day, date, user);
+}
+</script>
   <style>
     body { background: #0e0e0e; color: white; font-family: Arial; padding: 20px; }
     .day { background: #1e1e1e; border-radius: 10px; padding: 15px; margin-bottom: 30px; }
@@ -162,7 +170,15 @@
   </style>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr">
+function renderWorkout() {
+  const date = document.getElementById("dateInput").value;
+  const day = document.getElementById("daySelect").value;
+  const user = localStorage.getItem("username") || "Faris";
+  if (!date || !day) return alert("Please select date and day.");
+  renderDay(day, date, user);
+}
+</script>
 </head>
 <body>
   <h2>Calisthenics Tracker - Faris</h2>
