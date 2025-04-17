@@ -94,7 +94,7 @@
           const repKey = `${date}-${day}-${i}-reps`;
           const setKey = `${date}-${day}-${i}-sets`;
           const reps = await loadFromCloud(user, date, repKey);
-          const sets = await loadFromCloud(user, date, setKey);
+        const sets = await loadFromCloud(user, date, setKey);
 
           content += `
             <div class="exercise">
@@ -115,6 +115,10 @@
     }
 
     function save(user, date, key, value) {
+  if (value >= 0) {
+    saveToCloud(user, date, key, value);
+  }
+}
       if (value >= 0) {
         saveToCloud(user, date, key, value);
       }
