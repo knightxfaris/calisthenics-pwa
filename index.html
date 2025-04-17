@@ -1,274 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calisthenics Tracker</title>
-  <link rel="manifest" href="manifest.json"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-title" content="Calisthenics Tracker"/>
-  <link rel="apple-touch-icon" href="icon.png"/>
-  <style>
-    :root {
-      --bg-color: #0e0e0e;
-      --card-color: #1e1e1e;
-      --text-color: #ffffff;
-      --input-bg: #1d1d1d;
-      --button-bg: #333333;
-      --button-hover: #444444;
-    }
-    html, body {
-      background: var(--bg-color) !important;
-      color: var(--text-color) !important;
-      font-family: Arial;
-      padding: 20px;
-    }
-    h2, h3 { text-align: center; }
-    .day { margin-bottom: 30px; padding: 15px; background: var(--card-color); border-radius: 10px; }
-    .exercise { margin-bottom: 20px; }
-    img { max-width: 100%; border-radius: 10px; }
-    .input-group { display: flex; gap: 10px; margin-top: 5px; }
-    input {
-      background: #2b2b2b;
-      color: var(--text-color);
-      border: 1px solid #444;
-      border-radius: 5px;
-      appearance: none;
-      -webkit-appearance: none;
-    }
-      flex: 1;
-      padding: 8px;
-      background: var(--input-bg);
-      color: var(--text-color);
-      border: none;
-    }
-    .date { text-align: center; margin-bottom: 20px; font-size: 16px; }
-    button {
-      display: block;
-      margin: 10px auto;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: var(--button-bg);
-      color: var(--text-color);
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: var(--button-hover);
-    }
-    select {
-      display: block;
-      margin: 10px auto;
-      padding: 10px;
-      font-size: 16px;
-      background: var(--input-bg);
-      color: var(--text-color);
-      border: none;
-      border-radius: 5px;
-    }
-    #history, #calendarData {
-      background: var(--card-color);
-      padding: 10px;
-      border-radius: 10px;
-    }
-  </style>
-</head>
-<body onload="applyTheme()">
-  <button onclick="toggleTheme()" style="position:fixed;top:15px;right:15px;z-index:1000;padding:10px 15px;font-size:14px;display:flex;align-items:center;gap:8px;background:#333;border:none;border-radius:8px;color:white;">
-    <span>🌓</span> <span style="font-size:13px;">Theme</span>
-  </button>
-  <h2>Beginner Calisthenics - 4 Days</h2>
-  <div class="date" id="dateDisplay"></div>
-  <button onclick="saveDay()">✅ Save Today</button>
-  <button onclick="showHistory()">📅 Show Saved Days</button>
-  <button onclick="showSelectedDayResult()">🗓️ Show Selected Day Result</button>
-  <button onclick="scrollToTop()">⬆️ Back to Top</button>
-  <select id="datePicker" onchange="loadDateData(this.value)">
-    <option value="">📆 Select a date</option>
-  </select>
-  <div id="container"></div>
-  <div id="calendarData"></div>
-  <div id="history"></div>
-
-  <script>
-    const today = new Date();
-    const minDate = new Date(2025, 0, 1);
-    const maxDate = new Date(2030, 11, 31);
-
-    document.getElementById("dateDisplay").textContent = `Today's Date: ${today.toISOString().split('T')[0]}`;
-
-    function generateDatePicker() {
-      const picker = document.getElementById("datePicker");
-      for (let d = new Date(minDate); d <= maxDate; d.setDate(d.getDate() + 1)) {
-        const dateString = d.toISOString().split('T')[0];
-        const option = document.createElement("option");
-        option.value = dateString;
-        option.textContent = dateString;
-        picker.appendChild(option);
-      }
-    }
-
-    const schedule = {
-      "Day 1 - Full Body": [
-        { name: "Jumping Jacks (3x30)", gif: "jumping-jacks.gif" },
-        { name: "Incline Push-ups (3x10)", gif: "incline-pushups.gif" },
-        { name: "Wall Sit (3x45s)", gif: "wall-sit.gif" },
-        { name: "Mountain Climbers (3x20)", gif: "mountain-climbers.gif" }
-      ],
-      "Day 2 - Core": [
-        { name: "Plank (3x30s)", gif: "plank.gif" },
-        { name: "Crunches (3x20)", gif: "crunches.gif" },
-        { name: "Leg Raises (3x15)", gif: "leg-raises.gif" },
-        { name: "Flutter Kicks (3x30s)", gif: "flutter-kicks.gif" }
-      ],
-      "Day 3 - Lower Body": [
-        { name: "Squats (3x15)", gif: "squats.gif" },
-        { name: "Lunges (3x10/leg)", gif: "lunges.gif" },
-        { name: "Calf Raises (3x20)", gif: "calf-raises.gif" },
-        { name: "Glute Bridges (3x15)", gif: "glute-bridges.gif" }
-      ],
-      "Day 4 - Upper Body": [
-        { name: "Wall Push-ups (3x15)", gif: "wall-pushups.gif" },
-        { name: "Arm Circles (3x30s)", gif: "arm-circles.gif" },
-        { name: "Superman Hold (3x20s)", gif: "superman-hold.gif" },
-        { name: "Chair Dips (3x10)", gif: "chair-dips.gif" }
-      ]
-    };
-
-    const container = document.getElementById("container");
-    const calendarDiv = document.getElementById("calendarData");
-
-    function generateUI(date) {
-      container.innerHTML = "";
-      for (let day in schedule) {
-        let dayDiv = document.createElement("div");
-        dayDiv.className = "day";
-        let header = `<h3>${day}</h3>`;
-        let content = "";
-
-        schedule[day].forEach((ex, i) => {
-          const repKey = `${date}-${day}-${i}-reps`;
-          const setKey = `${date}-${day}-${i}-sets`;
-          let reps = localStorage.getItem(repKey) || "";
-          let sets = localStorage.getItem(setKey) || "";
-          content += `
-            <div class="exercise">
-              <p><strong>${ex.name}</strong></p>
-              <img src="${ex.gif}" alt="${ex.name}">
-              <div class="input-group">
-                <input type="number" inputmode="numeric" pattern="[0-9]*" placeholder="Reps" value="${reps}" onchange="saveData('${repKey}', this.value)" min="0">
-                <input type="number" inputmode="numeric" pattern="[0-9]*" placeholder="Sets" value="${sets}" onchange="saveData('${setKey}', this.value)" min="0">
-              </div>
-            </div>
-          `;
-        });
-
-        dayDiv.innerHTML = header + content;
-        container.appendChild(dayDiv);
-      }
-    }
-
-    function saveData(key, value) {
-      if (value >= 0) {
-        localStorage.setItem(key, value);
-      }
-    }
-
-    function saveDay() {
-      const todayString = today.toISOString().split('T')[0];
-      let savedDates = JSON.parse(localStorage.getItem("savedDates") || "[]");
-      if (!savedDates.includes(todayString)) {
-        savedDates.push(todayString);
-        localStorage.setItem("savedDates", JSON.stringify(savedDates));
-        populateDatePicker();
-      }
-      alert("✅ Data saved!");
-    }
-
-    function populateDatePicker() {
-      let dates = JSON.parse(localStorage.getItem("savedDates") || "[]");
-      let picker = document.getElementById("datePicker");
-      picker.innerHTML = '<option value="">📆 Select a date</option>';
-      dates.forEach(d => {
-        picker.innerHTML += `<option value="${d}">${d}</option>`;
-      });
-    }
-
-    function showHistory() {
-      let savedDates = JSON.parse(localStorage.getItem("savedDates") || "[]");
-      let historyDiv = document.getElementById("history");
-      historyDiv.innerHTML = "<h3>📅 Previous Days:</h3>";
-      if (savedDates.length === 0) {
-        historyDiv.innerHTML += "<p>No saved days yet.</p>";
-        return;
-      }
-      savedDates.forEach(d => {
-        historyDiv.innerHTML += `<p>✅ ${d}</p>`;
-      });
-    }
-
-    function showSelectedDayResult() {
-      const selectedDate = document.getElementById("datePicker").value;
-      if (!selectedDate) {
-        alert("Please select a date first!");
-        return;
-      }
-      loadDateData(selectedDate);
-      const resultSection = document.getElementById("calendarData");
-      if (resultSection) {
-        resultSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
-
-    function loadDateData(date) {
-      if (!date) return;
-      calendarDiv.innerHTML = `<h3>Saved Data for ${date}</h3>`;
-      for (let day in schedule) {
-        calendarDiv.innerHTML += `<h4>${day}</h4>`;
-        schedule[day].forEach((ex, i) => {
-          const repKey = `${date}-${day}-${i}-reps`;
-          const setKey = `${date}-${day}-${i}-sets`;
-          let reps = localStorage.getItem(repKey) || "-";
-          let sets = localStorage.getItem(setKey) || "-";
-          calendarDiv.innerHTML += `<p>${ex.name}: Reps ${reps}, Sets ${sets}</p>`;
-        });
-      }
-    }
-
-    function scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function toggleTheme() {
-      const current = localStorage.getItem("theme") || "dark";
-      const newTheme = current === "dark" ? "light" : "dark";
-      localStorage.setItem("theme", newTheme);
-      applyTheme();
-    }
-
-    function applyTheme() {
-      const theme = localStorage.getItem("theme") || "dark";
-      if (theme === "light") {
-        document.documentElement.style.setProperty("--bg-color", "#f0f0f0");
-        document.documentElement.style.setProperty("--card-color", "#ffffff");
-        document.documentElement.style.setProperty("--text-color", "#000000");
-        document.documentElement.style.setProperty("--input-bg", "#ffffff");
-        document.documentElement.style.setProperty("--button-bg", "#dddddd");
-        document.documentElement.style.setProperty("--button-hover", "#cccccc");
-      } else {
-        document.documentElement.style.setProperty("--bg-color", "#0e0e0e");
-        document.documentElement.style.setProperty("--card-color", "#1e1e1e");
-        document.documentElement.style.setProperty("--text-color", "#ffffff");
-        document.documentElement.style.setProperty("--input-bg", "#1d1d1d");
-        document.documentElement.style.setProperty("--button-bg", "#333333");
-        document.documentElement.style.setProperty("--button-hover", "#444444");
-      }
-    }
-
-    generateUI(today.toISOString().split('T')[0]);
-    populateDatePicker();
-    generateDatePicker();
-  </script>
+<html>
+<head><title>Test</title></head>
+<body>
+<div class="exercise">
+  <p><strong>Squats (3x15)</strong></p>
+  <img src="squats.gif" alt="Squats (3x15)">
+  <div class="input-group">
+    <input type="number" placeholder="Reps" onchange="saveData('2025-01-01-Day 3 - Lower Body-0-reps', this.value)">
+    <input type="number" placeholder="Sets" onchange="saveData('2025-01-01-Day 3 - Lower Body-0-sets', this.value)">
+    <button onclick="saveExercise(this)" style="margin-top:5px;">💾 Save This</button>
+  </div>
+</div>
+<script>
+function saveData(key, value) {
+  if (value >= 0) localStorage.setItem(key, value);
+}
+function saveExercise(button) {
+  const inputs = button.parentElement.querySelectorAll('input');
+  if (inputs.length === 2) {
+    const repInput = inputs[0];
+    const setInput = inputs[1];
+    const repKey = repInput.getAttribute("onchange").match(/'([^']+)'/)[1];
+    const setKey = setInput.getAttribute("onchange").match(/'([^']+)'/)[1];
+    localStorage.setItem(repKey, repInput.value);
+    localStorage.setItem(setKey, setInput.value);
+    alert("Saved this exercise!");
+  }
+}
+</script>
+<button onclick="scrollToTop()" style="margin-top: 40px;">⬆️ Back to Top</button>
 </body>
 </html>
