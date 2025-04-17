@@ -45,7 +45,12 @@
       document.getElementById("dateDisplay").textContent = `User: ${user} | ${today}`;
       generateUI(today, user);
       populateDatePicker();
-      generateDatePicker();
+      flatpickr("#datePicker", {
+  dateFormat: "Y-m-d",
+  onChange: function(selectedDates, dateStr) {
+    generateUI(dateStr, localStorage.getItem("username") || "Faris");
+  }
+});
     };
 
     const schedule = {
@@ -151,11 +156,14 @@
     button:hover { background: #444; }
     select { padding: 10px; border-radius: 5px; background: #1d1d1d; color: white; border: none; }
   </style>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <h2>Calisthenics Tracker - Faris</h2>
   <div id="dateDisplay"></div>
-  <select id="datePicker" onchange="generateUI(this.value || new Date().toISOString().split('T')[0], localStorage.getItem('username') || 'Faris')">
+  <input id="datePicker" onchange="generateUI(this.value, localStorage.getItem('username') || 'Faris')">
     <option value="">📅 Select a date</option>
   </select>
   <div id="container"></div>
