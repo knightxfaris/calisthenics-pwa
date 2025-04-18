@@ -21,7 +21,7 @@ function saveDay() {
     saveToCloud(user, date, `${date}-${day}-${i}-sets`, sets);
   });
 
-  alert("✅ All exercises saved!");
+  alert("✅ تم حفظ اليوم بنجاح!");
 }
 
 function goBack() {
@@ -188,7 +188,7 @@ function saveDay() {
     saveToCloud(user, date, `${date}-${day}-${i}-sets`, sets);
   });
 
-  alert("✅ All exercises saved!");
+  alert("✅ تم حفظ اليوم بنجاح!");
 }
 
 function goBack() {
@@ -214,11 +214,12 @@ function goBack() {
   </div>
 
   
-<div id="container"></div>
-<div style="text-align:center; margin: 40px 0;">
-  <button style="display:inline-block; min-width:150px;" onclick="saveDay()">✅ Save Day</button>
-  <button style="display:inline-block; min-width:150px;" onclick="goBack()">🔙 Back</button>
+
+<div style="text-align:center; margin: 20px 0;">
+  <button onclick="saveDay()" style="padding: 12px 20px; font-size: 16px; background: #00aa00; color: white; border-radius: 6px;">✅ Save Day</button>
+  <button onclick="goBack()" style="padding: 12px 20px; font-size: 16px; background: #555; color: white; border-radius: 6px;">🔙 Back</button>
 </div>
+<div id="container"></div>
 
 
 </body>
