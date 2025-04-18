@@ -1,53 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Workout Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr">
-function saveDay() {
-  const inputs = document.querySelectorAll("#container .exercise");
-  const user = localStorage.getItem("username") || "Faris";
-  const date = localStorage.getItem("selectedDate") || new Date().toISOString().split("T")[0];
-  const day = document.getElementById("daySelect").value;
-  if (!date || !day) return alert("Please select date and day.");
-
-  inputs.forEach((div, i) => {
-    const rep = div.querySelector("input:nth-of-type(1)").value;
-    const set = div.querySelector("input:nth-of-type(2)").value;
-    const repKey = `${date}-${day}-${i}-reps`;
-    const setKey = `${date}-${day}-${i}-sets`;
-    saveToCloud(user, date, repKey, rep);
-    saveToCloud(user, date, setKey, set);
-  });
-
-  alert("All exercises saved for the day ✅");
-}
-
-async function showPreviousResults() {
-  const date = document.getElementById("prevDateInput").value;
-  const user = localStorage.getItem("username") || "Faris";
-  const output = document.getElementById("previousResults");
-  if (!date) return alert("Select a previous date first.");
-
-  const ref = doc(db, "users", user);
-  const snap = await getDoc(ref);
-  if (!snap.exists() || !snap.data()[date]) {
-    output.innerHTML = "<p>No data found for that date.</p>";
-    return;
-  }
-
-  const data = snap.data()[date];
-  let html = `<h4>Results for ${date}</h4>`;
-  Object.keys(data).forEach(k => {
-    html += `<p><strong>${k}</strong>: ${data[k]}</p>`;
-  });
-  output.innerHTML = html;
-}
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <style>
     body {
       background: #0e0e0e;
@@ -59,11 +18,7 @@ async function showPreviousResults() {
       text-align: center;
       margin-bottom: 20px;
     }
-    .input-section {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    select, input[type="text"] {
+    select, input[type="number"] {
       padding: 10px;
       margin: 5px;
       background: #1d1d1d;
@@ -72,21 +27,16 @@ async function showPreviousResults() {
       border-radius: 5px;
     }
     button {
+      padding: 10px 20px;
       background: #333;
       color: white;
       border: none;
-      padding: 10px 20px;
       border-radius: 5px;
+      margin: 10px;
       cursor: pointer;
     }
     button:hover {
       background: #444;
-    }
-    .exercise {
-      background: #1e1e1e;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
     }
     img {
       display: block;
@@ -97,19 +47,11 @@ async function showPreviousResults() {
       background: #000;
       border-radius: 10px;
     }
-    input[type="number"] {
-      width: 100px;
-      padding: 8px;
-      margin: 5px;
-      background: #1d1d1d;
-      color: white;
-      border: 1px solid #444;
-      border-radius: 5px;
-      touch-action: manipulation;
-    }
-    #dateDisplay {
-      text-align: center;
-      margin-bottom: 10px;
+    .exercise {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
     }
   </style>
   <script type="module">
@@ -175,21 +117,16 @@ async function showPreviousResults() {
     }
 
     window.renderWorkout = async function() {
+      const user = localStorage.getItem("username") || "Faris";
       const date = localStorage.getItem("selectedDate") || new Date().toISOString().split("T")[0];
       const day = document.getElementById("daySelect").value;
-      const user = localStorage.getItem("username") || "Faris";
       const container = document.getElementById("container");
-  container.innerHTML = "";
-      const dateDisplay = document.getElementById("dateDisplay");
-
-      if (!date || !day) return alert("Please select date and day.");
-
-      document.getElementById("dateDisplay").textContent = `User: ${user} | Date: ${date}`;
       container.innerHTML = "";
 
-      const dayData = schedule[day];
-      if (!dayData) return;
+      if (!day) return alert("Please select a day.");
+      document.getElementById("dateDisplay").textContent = `User: ${user} | Date: ${date} | ${day}`;
 
+      const dayData = schedule[day];
       for (let i = 0; i < dayData.length; i++) {
         const ex = dayData[i];
         const repKey = `${date}-${day}-${i}-reps`;
@@ -200,104 +137,39 @@ async function showPreviousResults() {
 
         const div = document.createElement("div");
         div.className = "exercise";
-        div.innerHTML = `<h4>${ex.name}</h4><img src="${ex.gif}" alt="${ex.name}">
+        div.innerHTML = `
           <h4>${ex.name}</h4>
           <img src="${ex.gif}" alt="${ex.name}">
-          <input type="number" placeholder="Reps" value="${reps}" onchange="saveToCloud('${user}','${date}','${repKey}', this.value)">
-          <input type="number" placeholder="Sets" value="${sets}" onchange="saveToCloud('${user}','${date}','${setKey}', this.value)">
+          <input type="number" value="${reps}" placeholder="Reps" onchange="saveToCloud('${user}','${date}','${repKey}', this.value)">
+          <input type="number" value="${sets}" placeholder="Sets" onchange="saveToCloud('${user}','${date}','${setKey}', this.value)">
+          <button onclick="saveToCloud('${user}','${date}','${repKey}', this.previousElementSibling.previousElementSibling.value); saveToCloud('${user}','${date}','${setKey}', this.previousElementSibling.value)">💾 Save This</button>
         `;
-        
-        const saveBtn = document.createElement("button");
-        saveBtn.textContent = "💾 Save This";
-        saveBtn.onclick = () => {
-          const inputs = div.querySelectorAll("input");
-          saveToCloud(user, date, repKey, inputs[0].value);
-          saveToCloud(user, date, setKey, inputs[1].value);
-          alert("Exercise saved ✅");
-        };
-        div.appendChild(saveBtn);
         container.appendChild(div);
-        
       }
     }
 
     window.onload = () => {
-      flatpickr("#dateInput", {
-  dateFormat: "Y-m-d",
-  defaultDate: new Date()
-});
-flatpickr("#prevDateInput", {
-  dateFormat: "Y-m-d"
-});
-        dateFormat: "Y-m-d",
-        defaultDate: new Date()
-      });
+      document.getElementById("daySelect").selectedIndex = 0;
     };
-  
-function saveDay() {
-  const inputs = document.querySelectorAll("#container .exercise");
-  const user = localStorage.getItem("username") || "Faris";
-  const date = localStorage.getItem("selectedDate") || new Date().toISOString().split("T")[0];
-  const day = document.getElementById("daySelect").value;
-  if (!date || !day) return alert("Please select date and day.");
-
-  inputs.forEach((div, i) => {
-    const rep = div.querySelector("input:nth-of-type(1)").value;
-    const set = div.querySelector("input:nth-of-type(2)").value;
-    const repKey = `${date}-${day}-${i}-reps`;
-    const setKey = `${date}-${day}-${i}-sets`;
-    saveToCloud(user, date, repKey, rep);
-    saveToCloud(user, date, setKey, set);
-  });
-
-  alert("All exercises saved for the day ✅");
-}
-
-async function showPreviousResults() {
-  const date = document.getElementById("prevDateInput").value;
-  const user = localStorage.getItem("username") || "Faris";
-  const output = document.getElementById("previousResults");
-  if (!date) return alert("Select a previous date first.");
-
-  const ref = doc(db, "users", user);
-  const snap = await getDoc(ref);
-  if (!snap.exists() || !snap.data()[date]) {
-    output.innerHTML = "<p>No data found for that date.</p>";
-    return;
-  }
-
-  const data = snap.data()[date];
-  let html = `<h4>Results for ${date}</h4>`;
-  Object.keys(data).forEach(k => {
-    html += `<p><strong>${k}</strong>: ${data[k]}</p>`;
-  });
-  output.innerHTML = html;
-}
-</script>
+  </script>
 </head>
 <body>
   <h2>Calisthenics Tracker</h2>
-  <div class="input-section">
-    <input type="text" id="dateInput" placeholder="Select a date" />
+  <p id="dateDisplay" style="text-align:center;"></p>
+
+  <div style="text-align:center;margin:20px;">
+    <label>Select Workout Day:</label><br>
     <select id="daySelect">
-      <option value="">-- Select Day --</option>
+      <option value="">-- Choose Day --</option>
       <option value="Day 1 - Full Body">Day 1 - Full Body</option>
       <option value="Day 2 - Core">Day 2 - Core</option>
       <option value="Day 3 - Lower Body">Day 3 - Lower Body</option>
       <option value="Day 4 - Upper Body">Day 4 - Upper Body</option>
     </select>
+    <br>
     <button onclick="renderWorkout()">Show Exercises</button>
-    <button onclick="saveDay()" style="margin-left: 10px;">✅ Save Day</button>
   </div>
-  <div id="dateDisplay"></div>
-  
-<div style="text-align:center; margin: 30px 0;">
-  <h3>📅 Previous Results</h3>
-  <input type="text" id="prevDateInput" placeholder="Select a previous date" style="margin-bottom: 10px;" />
-  <button onclick="showPreviousResults()">📖 Show Previous Results</button>
-</div>
-<div id="previousResults" style="margin-bottom: 40px;"></div>
-<div id="container"></div>
 
+  <div id="container"></div>
 </body>
 </html>
