@@ -7,7 +7,26 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Workout Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr">
+function saveDay() {
+  const inputs = document.querySelectorAll("#container .exercise");
+  const user = localStorage.getItem("username") || "Faris";
+  const date = document.getElementById("dateInput").value;
+  const day = document.getElementById("daySelect").value;
+  if (!date || !day) return alert("Please select date and day.");
+
+  inputs.forEach((div, i) => {
+    const rep = div.querySelector("input:nth-of-type(1)").value;
+    const set = div.querySelector("input:nth-of-type(2)").value;
+    const repKey = `${date}-${day}-${i}-reps`;
+    const setKey = `${date}-${day}-${i}-sets`;
+    saveToCloud(user, date, repKey, rep);
+    saveToCloud(user, date, setKey, set);
+  });
+
+  alert("All exercises saved for the day ✅");
+}
+</script>
   <style>
     body {
       background: #0e0e0e;
@@ -159,13 +178,24 @@
 
         const div = document.createElement("div");
         div.className = "exercise";
-        div.innerHTML = `
+        div.innerHTML = `<h4>${ex.name}</h4><img src="${ex.gif}" alt="${ex.name}">
           <h4>${ex.name}</h4>
           <img src="${ex.gif}" alt="${ex.name}">
           <input type="number" placeholder="Reps" value="${reps}" onchange="saveToCloud('${user}','${date}','${repKey}', this.value)">
           <input type="number" placeholder="Sets" value="${sets}" onchange="saveToCloud('${user}','${date}','${setKey}', this.value)">
         `;
+        
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "💾 Save This";
+        saveBtn.onclick = () => {
+          const inputs = div.querySelectorAll("input");
+          saveToCloud(user, date, repKey, inputs[0].value);
+          saveToCloud(user, date, setKey, inputs[1].value);
+          alert("Exercise saved ✅");
+        };
+        div.appendChild(saveBtn);
         container.appendChild(div);
+        
       }
     }
 
@@ -175,7 +205,26 @@
         defaultDate: new Date()
       });
     };
-  </script>
+  
+function saveDay() {
+  const inputs = document.querySelectorAll("#container .exercise");
+  const user = localStorage.getItem("username") || "Faris";
+  const date = document.getElementById("dateInput").value;
+  const day = document.getElementById("daySelect").value;
+  if (!date || !day) return alert("Please select date and day.");
+
+  inputs.forEach((div, i) => {
+    const rep = div.querySelector("input:nth-of-type(1)").value;
+    const set = div.querySelector("input:nth-of-type(2)").value;
+    const repKey = `${date}-${day}-${i}-reps`;
+    const setKey = `${date}-${day}-${i}-sets`;
+    saveToCloud(user, date, repKey, rep);
+    saveToCloud(user, date, setKey, set);
+  });
+
+  alert("All exercises saved for the day ✅");
+}
+</script>
 </head>
 <body>
   <h2>Calisthenics Tracker</h2>
@@ -189,6 +238,7 @@
       <option value="Day 4 - Upper Body">Day 4 - Upper Body</option>
     </select>
     <button onclick="renderWorkout()">Show Exercises</button>
+    <button onclick="saveDay()" style="margin-left: 10px;">✅ Save Day</button>
   </div>
   <div id="dateDisplay"></div>
   <div id="container"></div>
