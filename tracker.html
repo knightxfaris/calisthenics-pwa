@@ -6,7 +6,28 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Workout Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr">
+function saveDay() {
+  const user = localStorage.getItem("username") || "Faris";
+  const date = localStorage.getItem("selectedDate") || new Date().toISOString().split("T")[0];
+  const day = document.getElementById("daySelect").value;
+  const all = document.querySelectorAll(".exercise");
+  if (!day) return alert("Please select a workout day.");
+
+  all.forEach((div, i) => {
+    const reps = div.querySelector("input:nth-of-type(1)").value;
+    const sets = div.querySelector("input:nth-of-type(2)").value;
+    saveToCloud(user, date, `${date}-${day}-${i}-reps`, reps);
+    saveToCloud(user, date, `${date}-${day}-${i}-sets`, sets);
+  });
+
+  alert("✅ All exercises saved!");
+}
+
+function goBack() {
+  window.location.href = "index.html";
+}
+</script>
   <style>
     body {
       background: #0e0e0e;
@@ -142,7 +163,7 @@
           <img src="${ex.gif}" alt="${ex.name}">
           <input type="number" value="${reps}" placeholder="Reps" onchange="saveToCloud('${user}','${date}','${repKey}', this.value)">
           <input type="number" value="${sets}" placeholder="Sets" onchange="saveToCloud('${user}','${date}','${setKey}', this.value)">
-          <button onclick="saveToCloud('${user}','${date}','${repKey}', this.previousElementSibling.previousElementSibling.value); saveToCloud('${user}','${date}','${setKey}', this.previousElementSibling.value)">💾 Save This</button>
+          
         `;
         container.appendChild(div);
       }
@@ -151,7 +172,28 @@
     window.onload = () => {
       document.getElementById("daySelect").selectedIndex = 0;
     };
-  </script>
+  
+function saveDay() {
+  const user = localStorage.getItem("username") || "Faris";
+  const date = localStorage.getItem("selectedDate") || new Date().toISOString().split("T")[0];
+  const day = document.getElementById("daySelect").value;
+  const all = document.querySelectorAll(".exercise");
+  if (!day) return alert("Please select a workout day.");
+
+  all.forEach((div, i) => {
+    const reps = div.querySelector("input:nth-of-type(1)").value;
+    const sets = div.querySelector("input:nth-of-type(2)").value;
+    saveToCloud(user, date, `${date}-${day}-${i}-reps`, reps);
+    saveToCloud(user, date, `${date}-${day}-${i}-sets`, sets);
+  });
+
+  alert("✅ All exercises saved!");
+}
+
+function goBack() {
+  window.location.href = "index.html";
+}
+</script>
 </head>
 <body>
   <h2>Calisthenics Tracker</h2>
@@ -170,6 +212,12 @@
     <button onclick="renderWorkout()">Show Exercises</button>
   </div>
 
-  <div id="container"></div>
+  
+<div style="text-align:center; margin-bottom: 20px;">
+  <button onclick="saveDay()">✅ Save Day</button>
+  <button onclick="goBack()">🔙 Back</button>
+</div>
+<div id="container"></div>
+
 </body>
 </html>
