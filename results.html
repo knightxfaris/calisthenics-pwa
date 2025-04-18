@@ -1,1 +1,69 @@
-<!DOCTYPE html><html><head><title>Results</title></head><body><h2 style='color:white;background:#0e0e0e;padding:30px;'>Results Page Coming Soon</h2></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Previous Results</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGDV3F8YZ6-bqtkx4AMbEt-Sy8PYlPkUU",
+      authDomain: "calisthenics-tracker-45570.firebaseapp.com",
+      projectId: "calisthenics-tracker-45570",
+      storageBucket: "calisthenics-tracker-45570.firebasestorage.app",
+      messagingSenderId: "330168228790",
+      appId: "1:330168228790:web:c24cfe79e669e6237dbf17",
+      measurementId: "G-Y3KN5D0DCH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.onload = async () => {
+      const username = localStorage.getItem("username") || "Faris";
+      const date = localStorage.getItem("selectedDate");
+      const resultsDiv = document.getElementById("results");
+
+      if (!date) {
+        resultsDiv.innerHTML = "<p style='color:red;'>No date selected</p>";
+        return;
+      }
+
+      const ref = doc(db, "users", username);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists() || !snap.data()[date]) {
+        resultsDiv.innerHTML = `<p>No data found for ${date}</p>`;
+        return;
+      }
+
+      const data = snap.data()[date];
+      let output = `<h3>Results for ${username} on ${date}</h3>`;
+      Object.entries(data).forEach(([k, v]) => {
+        output += `<p><strong>${k}</strong>: ${v}</p>`;
+      });
+      resultsDiv.innerHTML = output;
+    }
+  </script>
+  <style>
+    body {
+      background: #0e0e0e;
+      color: white;
+      font-family: Arial;
+      padding: 20px;
+    }
+    h3 {
+      color: #00d4ff;
+    }
+    p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="results">Loading...</div>
+</body>
+</html>

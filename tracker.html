@@ -179,6 +179,7 @@ async function showPreviousResults() {
       const day = document.getElementById("daySelect").value;
       const user = localStorage.getItem("username") || "Faris";
       const container = document.getElementById("container");
+  container.innerHTML = "";
       const dateDisplay = document.getElementById("dateDisplay");
 
       if (!date || !day) return alert("Please select date and day.");
