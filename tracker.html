@@ -11,7 +11,7 @@
 function saveDay() {
   const inputs = document.querySelectorAll("#container .exercise");
   const user = localStorage.getItem("username") || "Faris";
-  const date = document.getElementById("dateInput").value;
+  const date = localStorage.getItem("selectedDate") || new Date().toISOString().split("T")[0];
   const day = document.getElementById("daySelect").value;
   if (!date || !day) return alert("Please select date and day.");
 
@@ -175,7 +175,7 @@ async function showPreviousResults() {
     }
 
     window.renderWorkout = async function() {
-      const date = document.getElementById("dateInput").value;
+      const date = localStorage.getItem("selectedDate") || new Date().toISOString().split("T")[0];
       const day = document.getElementById("daySelect").value;
       const user = localStorage.getItem("username") || "Faris";
       const container = document.getElementById("container");
@@ -184,7 +184,7 @@ async function showPreviousResults() {
 
       if (!date || !day) return alert("Please select date and day.");
 
-      dateDisplay.textContent = `User: ${user} | Date: ${date}`;
+      document.getElementById("dateDisplay").textContent = `User: ${user} | Date: ${date}`;
       container.innerHTML = "";
 
       const dayData = schedule[day];
@@ -237,7 +237,7 @@ flatpickr("#prevDateInput", {
 function saveDay() {
   const inputs = document.querySelectorAll("#container .exercise");
   const user = localStorage.getItem("username") || "Faris";
-  const date = document.getElementById("dateInput").value;
+  const date = localStorage.getItem("selectedDate") || new Date().toISOString().split("T")[0];
   const day = document.getElementById("daySelect").value;
   if (!date || !day) return alert("Please select date and day.");
 
