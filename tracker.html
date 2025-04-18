@@ -142,6 +142,7 @@ function goBack() {
       const date = localStorage.getItem("selectedDate") || new Date().toISOString().split("T")[0];
       const day = document.getElementById("daySelect").value;
       const container = document.getElementById("container");
+  container.innerHTML = "";
       container.innerHTML = "";
 
       if (!day) return alert("Please select a day.");
