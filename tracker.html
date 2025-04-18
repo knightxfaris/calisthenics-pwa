@@ -26,6 +26,27 @@ function saveDay() {
 
   alert("All exercises saved for the day ✅");
 }
+
+async function showPreviousResults() {
+  const date = document.getElementById("prevDateInput").value;
+  const user = localStorage.getItem("username") || "Faris";
+  const output = document.getElementById("previousResults");
+  if (!date) return alert("Select a previous date first.");
+
+  const ref = doc(db, "users", user);
+  const snap = await getDoc(ref);
+  if (!snap.exists() || !snap.data()[date]) {
+    output.innerHTML = "<p>No data found for that date.</p>";
+    return;
+  }
+
+  const data = snap.data()[date];
+  let html = `<h4>Results for ${date}</h4>`;
+  Object.keys(data).forEach(k => {
+    html += `<p><strong>${k}</strong>: ${data[k]}</p>`;
+  });
+  output.innerHTML = html;
+}
 </script>
   <style>
     body {
@@ -201,6 +222,12 @@ function saveDay() {
 
     window.onload = () => {
       flatpickr("#dateInput", {
+  dateFormat: "Y-m-d",
+  defaultDate: new Date()
+});
+flatpickr("#prevDateInput", {
+  dateFormat: "Y-m-d"
+});
         dateFormat: "Y-m-d",
         defaultDate: new Date()
       });
@@ -224,6 +251,27 @@ function saveDay() {
 
   alert("All exercises saved for the day ✅");
 }
+
+async function showPreviousResults() {
+  const date = document.getElementById("prevDateInput").value;
+  const user = localStorage.getItem("username") || "Faris";
+  const output = document.getElementById("previousResults");
+  if (!date) return alert("Select a previous date first.");
+
+  const ref = doc(db, "users", user);
+  const snap = await getDoc(ref);
+  if (!snap.exists() || !snap.data()[date]) {
+    output.innerHTML = "<p>No data found for that date.</p>";
+    return;
+  }
+
+  const data = snap.data()[date];
+  let html = `<h4>Results for ${date}</h4>`;
+  Object.keys(data).forEach(k => {
+    html += `<p><strong>${k}</strong>: ${data[k]}</p>`;
+  });
+  output.innerHTML = html;
+}
 </script>
 </head>
 <body>
@@ -241,6 +289,14 @@ function saveDay() {
     <button onclick="saveDay()" style="margin-left: 10px;">✅ Save Day</button>
   </div>
   <div id="dateDisplay"></div>
-  <div id="container"></div>
+  
+<div style="text-align:center; margin: 30px 0;">
+  <h3>📅 Previous Results</h3>
+  <input type="text" id="prevDateInput" placeholder="Select a previous date" style="margin-bottom: 10px;" />
+  <button onclick="showPreviousResults()">📖 Show Previous Results</button>
+</div>
+<div id="previousResults" style="margin-bottom: 40px;"></div>
+<div id="container"></div>
+
 </body>
 </html>
