@@ -1,20 +1,196 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Tracker</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Workout Tracker</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <style>
+    body {
+      background: #0e0e0e;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .input-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    select, input[type="text"] {
+      padding: 10px;
+      margin: 5px;
+      background: #1d1d1d;
+      border: 1px solid #444;
+      color: white;
+      border-radius: 5px;
+    }
+    button {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #444;
+    }
+    .exercise {
+      background: #1e1e1e;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    img {
+      display: block;
+      margin: 10px auto;
+      max-width: 300px;
+      height: 225px;
+      object-fit: contain;
+      background: #000;
+      border-radius: 10px;
+    }
+    input[type="number"] {
+      width: 100px;
+      padding: 8px;
+      margin: 5px;
+      background: #1d1d1d;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 5px;
+      touch-action: manipulation;
+    }
+    #dateDisplay {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+  </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBGDV3F8YZ6-bqtkx4AMbEt-Sy8PYlPkUU",
+      authDomain: "calisthenics-tracker-45570.firebaseapp.com",
+      projectId: "calisthenics-tracker-45570",
+      storageBucket: "calisthenics-tracker-45570.firebasestorage.app",
+      messagingSenderId: "330168228790",
+      appId: "1:330168228790:web:c24cfe79e669e6237dbf17",
+      measurementId: "G-Y3KN5D0DCH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const schedule = {
+      "Day 1 - Full Body": [
+        { name: "Jumping Jacks (3x30)", gif: "jumping-jacks.gif" },
+        { name: "Incline Push-ups (3x10)", gif: "incline-pushups.gif" },
+        { name: "Wall Sit (3x45s)", gif: "wall-sit.gif" },
+        { name: "Mountain Climbers (3x20)", gif: "mountain-climbers.gif" }
+      ],
+      "Day 2 - Core": [
+        { name: "Plank (3x30s)", gif: "plank.gif" },
+        { name: "Crunches (3x20)", gif: "crunches.gif" },
+        { name: "Leg Raises (3x15)", gif: "leg-raises.gif" },
+        { name: "Flutter Kicks (3x30s)", gif: "flutter-kicks.gif" }
+      ],
+      "Day 3 - Lower Body": [
+        { name: "Squats (3x15)", gif: "squats.gif" },
+        { name: "Lunges (3x10/leg)", gif: "lunges.gif" },
+        { name: "Calf Raises (3x20)", gif: "calf-raises.gif" },
+        { name: "Glute Bridges (3x15)", gif: "glute-bridges.gif" }
+      ],
+      "Day 4 - Upper Body": [
+        { name: "Wall Push-ups (3x15)", gif: "wall-pushups.gif" },
+        { name: "Arm Circles (3x30s)", gif: "arm-circles.gif" },
+        { name: "Superman Hold (3x20s)", gif: "superman-hold.gif" },
+        { name: "Chair Dips (3x10)", gif: "chair-dips.gif" }
+      ]
+    };
+
+    async function saveToCloud(user, date, key, value) {
+      const ref = doc(db, "users", user);
+      const snap = await getDoc(ref);
+      let data = snap.exists() ? snap.data() : {};
+      if (!data[date]) data[date] = {};
+      data[date][key] = value;
+      await setDoc(ref, data);
+    }
+
+    async function loadFromCloud(user, date, key) {
+      const ref = doc(db, "users", user);
+      const snap = await getDoc(ref);
+      if (snap.exists() && snap.data()[date]) {
+        return snap.data()[date][key] || "";
+      }
+      return "";
+    }
+
+    window.renderWorkout = async function() {
+      const date = document.getElementById("dateInput").value;
+      const day = document.getElementById("daySelect").value;
+      const user = localStorage.getItem("username") || "Faris";
+      const container = document.getElementById("container");
+      const dateDisplay = document.getElementById("dateDisplay");
+
+      if (!date || !day) return alert("Please select date and day.");
+
+      dateDisplay.textContent = `User: ${user} | Date: ${date}`;
+      container.innerHTML = "";
+
+      const dayData = schedule[day];
+      if (!dayData) return;
+
+      for (let i = 0; i < dayData.length; i++) {
+        const ex = dayData[i];
+        const repKey = `${date}-${day}-${i}-reps`;
+        const setKey = `${date}-${day}-${i}-sets`;
+
+        const reps = await loadFromCloud(user, date, repKey);
+        const sets = await loadFromCloud(user, date, setKey);
+
+        const div = document.createElement("div");
+        div.className = "exercise";
+        div.innerHTML = `
+          <h4>${ex.name}</h4>
+          <img src="${ex.gif}" alt="${ex.name}">
+          <input type="number" placeholder="Reps" value="${reps}" onchange="saveToCloud('${user}','${date}','${repKey}', this.value)">
+          <input type="number" placeholder="Sets" value="${sets}" onchange="saveToCloud('${user}','${date}','${setKey}', this.value)">
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    window.onload = () => {
+      flatpickr("#dateInput", {
+        dateFormat: "Y-m-d",
+        defaultDate: new Date()
+      });
+    };
+  </script>
 </head>
 <body>
-  <h2>Test Calendar</h2>
-  <input type="text" id="dateInput" placeholder="Pick a date"/>
-  <script>
-    flatpickr("#dateInput", {
-      dateFormat: "Y-m-d",
-      defaultDate: new Date()
-    });
-  </script>
+  <h2>Calisthenics Tracker</h2>
+  <div class="input-section">
+    <input type="text" id="dateInput" placeholder="Select a date" />
+    <select id="daySelect">
+      <option value="">-- Select Day --</option>
+      <option value="Day 1 - Full Body">Day 1 - Full Body</option>
+      <option value="Day 2 - Core">Day 2 - Core</option>
+      <option value="Day 3 - Lower Body">Day 3 - Lower Body</option>
+      <option value="Day 4 - Upper Body">Day 4 - Upper Body</option>
+    </select>
+    <button onclick="renderWorkout()">Show Exercises</button>
+  </div>
+  <div id="dateDisplay"></div>
+  <div id="container"></div>
 </body>
 </html>
